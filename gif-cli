@@ -3,7 +3,10 @@
 from PIL import Image, UnidentifiedImageError
 import time, os
 import argparse, sys
-import pathlib
+from io import BytesIO
+import requests
+import validators
+import pathvalidate
 
 
 def _resizeImage(image: Image.Image, max_size):
@@ -11,9 +14,44 @@ def _resizeImage(image: Image.Image, max_size):
     image.thumbnail(max_size, Image.LANCZOS)
     return image
 
-def _processGif(input_path, output_size: tuple[int, int]) -> list[tuple[Image.Image, float]]:
+def _formatSorter(format):
+    if format["url"].endswith(".gif"):
+        return format["dims"][0] * format["dims"][1]
+    else:
+        return -1
+
+def _getTenorUrl(searchTerm: str, apiKey: str, limit: int = 1) -> str:
+    url = f"https://g.tenor.com/v2/search?q={searchTerm}&key={apiKey}&limit={limit}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+
+        if len(data["results"]) == 0:
+            print("didnt find anything on Tenor.")
+            sys.exit(1)
+
+        formats = list(data["results"][0]["media_formats"].values())
+        return max(formats, key=_formatSorter)["url"]
+    elif response.status_code == 400:
+        print("the server could not understand the request because of invalid syntax")
+        sys.exit(1)
+    else:
+        print(response.status_code)
+        print(response.headers)
+        print("Failed to fetch GIFs from Tenor")
+        sys.exit(1)
+
+def _downloadFromTenor(url):
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        return response.content
+    else:
+        print("Failed to download GIF from Tenor")
+        sys.exit(1)
+
+def _processGif(img, output_size: tuple[int, int]) -> list[tuple[Image.Image, float]]:
     try:
-        with Image.open(input_path) as img:
+        with img:
             frames = []
             try:
                 while True:
@@ -43,8 +81,8 @@ def _printImage(image: Image.Image):
 
         for x in range(image.size[0]):
             pixel = pixels[x, y]
-
-            row += f"\033[48;2;{pixel[0]};{pixel[1]};{pixel[2]}m" + "  "
+            r, g, b = pixel[0], pixel[1], pixel[2] # cant do a simple unpack, because somethimes theres also alpha channel
+            row += f"\033[48;2;{r};{g};{b}m" + "  "
         
         rows.append(row)
     
@@ -77,8 +115,8 @@ parser = argparse.ArgumentParser(description="display a gif in the terminal", co
 
 parser.add_argument(
     "gif",
-    type=pathlib.Path,
-    help="Path to the gif file to display."
+    type=str,
+    help="Path or url to the gif file to display."
 )
 
 parser.add_argument(
@@ -87,6 +125,14 @@ parser.add_argument(
     dest="forever",
     action='store_true',
     help="Keep looping the gif until ^C is pressed."
+)
+
+parser.add_argument(
+    "-s",
+    "--search",
+    dest="search",
+    action='store_true',
+    help="Treat the gif argument as a search term for searching on Tenor."
 )
 
 parser.add_argument(
@@ -119,7 +165,17 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-frames = _processGif(args.gif.resolve(), (args.width, args.height))
+if args.search:
+    url = _getTenorUrl(args.gif, "AIzaSyAgVX5sxv-5uBTfzLB_-IbcwufxwpheppM")
+    gif = _downloadFromTenor(url)
+    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height))
+elif validators.url(args.gif):
+    gif = _downloadFromTenor(args.gif)
+    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height))
+elif pathvalidate.is_valid_filepath(args.gif):
+    frames = _processGif(Image.open(args.gif), (args.width, args.height))
+else:
+    print("The gif argument is not valid")
 
 # get height of the gif frame
 height = frames[0][0].size[1]
