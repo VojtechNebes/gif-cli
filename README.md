@@ -11,6 +11,7 @@ cd gif-cli &&
 chmod +x install.sh &&
 sudo ./install.sh
 ```
+Don't forget to also install all python libraries from `reqirements.txt`
 # Usage
 ```
 usage: gif-cli [--help] [-f] [-s] [-d DELAY] [-w WIDTH] [-h HEIGHT] gif
