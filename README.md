@@ -3,7 +3,7 @@ Display gifs in the terminal
 
 Also allows searching gifs on Tenor
 # Installation
-### Linux from source
+### Linux/MacOS from source
 Run the following command in your shell:
 ```sh
 git clone https://github.com/VojtechNebes/gif-cli.git &&
