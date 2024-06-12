@@ -16,4 +16,4 @@ sudo cp $SOURCE_FILE $DESTINATION
 # Make the file executable
 sudo chmod +x $DESTINATION
 
-echo "Installation complete. You can now run 'your_program' from the command line."
+echo "Installation complete."
