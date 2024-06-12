@@ -81,7 +81,7 @@ def _printImage(image: Image.Image):
 
         for x in range(image.size[0]):
             pixel = pixels[x, y]
-            r, g, b = pixel[0], pixel[1], pixel[2] # cant do a simple unpack, because somethimes theres also alpha channel
+            r, g, b = pixel[0], pixel[1], pixel[2] # cant do a simple unpack, because sometimes theres also alpha channel
             row += f"\033[48;2;{r};{g};{b}m" + "  "
         
         rows.append(row)
