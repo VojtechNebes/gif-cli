@@ -6,7 +6,7 @@ Also allows searching gifs on Tenor
 ### Linux from source
 Run the following command in your shell:
 ```sh
-git clone https://github.com/yourusername/yourrepository.git &&
+git clone https://github.com/VojtechNebes/gif-cli.git &&
 cd yourrepository &&
 chmod +x install.sh &&
 sudo ./install.sh
