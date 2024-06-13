@@ -170,7 +170,7 @@ parser.add_argument(
     "--wide",
     dest="wide",
     action='store_true',
-    help="Use the full width of the terminal."
+    help="Stretch the gif horizontally to use full width of the terminal."
 )
 
 args = parser.parse_args()

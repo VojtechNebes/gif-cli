@@ -31,7 +31,7 @@ options:
                         Maximum width of the output. Ignored when --wide is used.
   -h HEIGHT, --height HEIGHT
                         Maximum height of the output.
-  --wide                Use the full width of the terminal.
+  --wide                Stretch the gif horizontally to use full width of the terminal.
 ```
 ### Examples
 Open a .gif file and display it:
