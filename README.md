@@ -14,7 +14,7 @@ sudo ./install.sh
 Don't forget to also install all python libraries from `reqirements.txt`
 # Usage
 ```
-usage: gif-cli [--help] [-f] [-s] [-d DELAY] [-w WIDTH] [-h HEIGHT] gif
+usage: main.py [--help] [-f] [-s] [-d DELAY] [-w WIDTH] [-h HEIGHT] [--wide] gif
 
 display a gif in the terminal
 
@@ -28,9 +28,10 @@ options:
   -d DELAY, --delay DELAY
                         Delay between frames in seconds. When not specified, the delay is read from the gif file.
   -w WIDTH, --width WIDTH
-                        Maximum width of the output.
+                        Maximum width of the output. Ignored when --wide is used.
   -h HEIGHT, --height HEIGHT
                         Maximum height of the output.
+  --wide                Use the full width of the terminal.
 ```
 ### Examples
 Open a .gif file and display it:
@@ -39,7 +40,7 @@ gif-cli "/path/to/your/file.gif"
 ```
 Have the displayed gif only take up 20 lines vertically:
 ```sh
-gif-cli "/path/to/your/file.gif -h 20"
+gif-cli "/path/to/your/file.gif" -h 20
 ```
 Display a gif from the internet:
 ```sh

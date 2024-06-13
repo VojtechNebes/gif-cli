@@ -154,7 +154,7 @@ parser.add_argument(
     dest="width",
     type=int,
     default=terminalWidth,
-    help="Maximum width of the output."
+    help="Maximum width of the output. Ignored when --wide is used."
 )
 
 parser.add_argument(
@@ -167,7 +167,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-ww",
     "--wide",
     dest="wide",
     action='store_true',
