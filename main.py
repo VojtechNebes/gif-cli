@@ -9,9 +9,12 @@ import validators
 import pathvalidate
 
 
-def _resizeImage(image: Image.Image, max_size):
-    """Resize the image while maintaining aspect ratio."""
-    image.thumbnail(max_size, Image.LANCZOS)
+def _resizeImage(image: Image.Image, max_size, wide: bool):
+    """Resize the image without maintaining aspect ratio."""
+    if wide:
+        image = image.resize((terminalWidth // 2, max_size[1]), Image.LANCZOS)
+    else:
+        image.thumbnail(max_size, Image.LANCZOS)
     return image
 
 def _formatSorter(format):
@@ -49,14 +52,14 @@ def _downloadFromTenor(url):
         print("Failed to download GIF from Tenor")
         sys.exit(1)
 
-def _processGif(img, output_size: tuple[int, int]) -> list[tuple[Image.Image, float]]:
+def _processGif(img, output_size: tuple[int, int], wide: bool) -> list[tuple[Image.Image, float]]:
     try:
         with img:
             frames = []
             try:
                 while True:
                     # Get the current frame and resize it
-                    frame = _resizeImage(img.copy(), output_size)
+                    frame = _resizeImage(img.copy(), output_size, wide)
                     
                     # Append the resized frame to the frames list
                     frames.append((frame, frame.info["duration"]))
@@ -163,17 +166,26 @@ parser.add_argument(
     help="Maximum height of the output."
 )
 
+parser.add_argument(
+    "-ww",
+    "--wide",
+    dest="wide",
+    action='store_true',
+    help="Use the full width of the terminal."
+)
+
 args = parser.parse_args()
 
 if args.search:
     url = _getTenorUrl(args.gif, "AIzaSyAgVX5sxv-5uBTfzLB_-IbcwufxwpheppM")
     gif = _downloadFromTenor(url)
-    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height))
+    
+    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height), args.wide)
 elif validators.url(args.gif):
     gif = _downloadFromTenor(args.gif)
-    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height))
+    frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height), args.wide)
 elif pathvalidate.is_valid_filepath(args.gif):
-    frames = _processGif(Image.open(args.gif), (args.width, args.height))
+    frames = _processGif(Image.open(args.gif), (args.width, args.height), args.wide)
 else:
     print("The gif argument is not valid")
 
