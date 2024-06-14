@@ -176,7 +176,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.search:
-    url = _getTenorUrl(args.gif, "AIzaSyAgVX5sxv-5uBTfzLB_-IbcwufxwpheppM")
+    url = _getTenorUrl(args.gif, "AIzaSyAgVX5sxv-5uBTfzLB_-IbcwufxwpheppM") # yes, i know this shouldnt be here
     gif = _downloadFromTenor(url)
     
     frames = _processGif(Image.open(BytesIO(gif)), (args.width, args.height), args.wide)
